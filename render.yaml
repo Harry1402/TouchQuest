@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: touchquest
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: GEMMA_API_KEY
+        sync: false
+      - key: GEMMA_API_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: GEMMA_MODEL
+        value: gemma2-9b-it
