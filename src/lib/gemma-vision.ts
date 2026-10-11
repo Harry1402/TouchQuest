@@ -351,18 +351,21 @@ No preamble, no markdown formatting outside JSON.`;
       questType: params.questType,
     });
 
-    let notice = "Offline Curated Scene Mode active.";
-    if (errorMsg.includes("not found")) {
-      notice = `Ollama model '${config.model}' is not pulled yet. Run 'ollama pull ${config.model}' in your terminal for live vision inference. Showing curated offline quest.`;
-    } else if (
-      errorMsg.includes("fetch failed") ||
-      errorMsg.includes("ECONNREFUSED") ||
-      errorMsg.includes("timeout") ||
-      errorMsg.includes("AbortError")
-    ) {
-      notice = `Could not reach Ollama at ${config.baseUrl}. Make sure Ollama is running ('ollama run ${config.model}'). Showing curated offline quest.`;
+    let notice = "Showing curated offline nature quest.";
+    if (config.provider === "ollama") {
+      if (errorMsg.includes("not found")) {
+        notice = `Ollama model '${config.model}' is not pulled yet. Run 'ollama pull ${config.model}' in your terminal for live vision inference. Showing curated offline quest.`;
+      } else if (
+        errorMsg.includes("fetch failed") ||
+        errorMsg.includes("ECONNREFUSED") ||
+        errorMsg.includes("timeout") ||
+        errorMsg.includes("AbortError")
+      ) {
+        notice = `Could not reach Ollama at ${config.baseUrl}. Make sure Ollama is running ('ollama run ${config.model}'). Showing curated offline quest.`;
+      }
     } else {
-      notice = `Vision processing unavailable (${errorMsg.slice(0, 80)}). Showing curated offline quest.`;
+      notice =
+        "Showing curated nature quest (Cloud Demo Mode). For live on-device vision, run locally with Ollama Gemma 3.";
     }
 
     return {
