@@ -21,7 +21,7 @@ const SceneRequestSchema = z.object({
     .enum(["sensory", "scavenger", "micro_wonder", "sound_safari"])
     .optional()
     .default("sensory"),
-  userConsentRemote: z.boolean().optional().default(false),
+  userConsentRemote: z.boolean().optional().default(true),
 });
 
 export async function POST(request: Request) {

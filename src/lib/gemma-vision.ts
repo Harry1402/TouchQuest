@@ -185,7 +185,7 @@ export async function generateSceneQuest(
     );
   }
 
-  if (config.provider === "hosted" && !params.userConsentRemote) {
+  if (config.provider === "hosted" && params.userConsentRemote === false) {
     throw new Error(
       "Remote image processing requires explicit user consent. Please confirm transmission or use local Ollama."
     );

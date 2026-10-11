@@ -30,7 +30,7 @@ export function SceneCameraModal({
   >("idle");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [userConsentRemote, setUserConsentRemote] = useState<boolean>(false);
+  const [userConsentRemote, setUserConsentRemote] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
