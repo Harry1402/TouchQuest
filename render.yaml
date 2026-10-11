@@ -12,6 +12,8 @@ services:
       - key: GEMMA_API_KEY
         sync: false
       - key: GEMMA_API_BASE_URL
-        value: https://api.groq.com/openai/v1
+        value: https://generativelanguage.googleapis.com/v1beta/openai
       - key: GEMMA_MODEL
-        value: gemma2-9b-it
+        value: gemini-2.0-flash
+      - key: GEMMA_VISION_MODEL
+        value: gemini-2.0-flash

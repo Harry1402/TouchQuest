@@ -20,18 +20,18 @@ export interface VisionModelConfig {
 
 export function getVisionConfig(): VisionModelConfig {
   const ollamaUrl = process.env.OLLAMA_BASE_URL;
-  const visionModel = process.env.GEMMA_VISION_MODEL || "gemma3:4b";
+  const visionModel = process.env.GEMMA_VISION_MODEL;
   const apiKey = process.env.GEMMA_VISION_API_KEY || process.env.GEMMA_API_KEY;
   const hostedBaseUrl =
     process.env.GEMMA_VISION_BASE_URL ||
     process.env.GEMMA_API_BASE_URL ||
-    "https://api.groq.com/openai/v1";
+    "https://generativelanguage.googleapis.com/v1beta/openai";
 
   // If local Ollama is configured, prioritize local vision
   if (ollamaUrl) {
     return {
       provider: "ollama",
-      model: visionModel,
+      model: visionModel || "gemma3:4b",
       baseUrl: ollamaUrl,
       isLocal: true,
     };
@@ -41,7 +41,7 @@ export function getVisionConfig(): VisionModelConfig {
   if (apiKey) {
     return {
       provider: "hosted",
-      model: process.env.GEMMA_VISION_MODEL || "llama-3.2-11b-vision-preview",
+      model: visionModel || "gemini-2.0-flash",
       baseUrl: hostedBaseUrl,
       apiKey,
       isLocal: false,
@@ -50,7 +50,7 @@ export function getVisionConfig(): VisionModelConfig {
 
   return {
     provider: "unavailable",
-    model: visionModel,
+    model: visionModel || "gemini-2.0-flash",
     isLocal: false,
   };
 }

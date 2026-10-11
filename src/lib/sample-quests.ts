@@ -140,6 +140,99 @@ export function getSampleQuest(pref: QuestPreference): Quest {
   };
 }
 
+export const SCENE_SAMPLE_QUESTS = [
+  {
+    title: "Shadow Weave & Canopy Edge",
+    tagline: "Track how sunlight perforates foliage outside your frame.",
+    sceneCue: "Interlocking branch patterns and dappled sunlight filtering through overhead canopy.",
+    objective: "Expand your awareness from the single captured snapshot to the living horizon around you.",
+    sensoryAnchor: "Press your palm to a patch of ground where light meets shade to feel the micro-climate difference.",
+    steps: [
+      "Put your phone in your pocket and stand exactly where you captured the snapshot.",
+      "Look straight upward through the canopy gaps to track the direction of high-altitude clouds.",
+      "Take five slow breaths while watching how wind rustles the highest leaves.",
+    ],
+    lookBeyondFrame: "Look 15 paces away toward where the shadow edge dissolves into full sunlight.",
+    reflectionPrompt: "How does the temperature of shaded bark compare to the air on your cheeks?",
+    safetyTip: "Stay on safe paths and keep eyes clear of low-hanging branches.",
+  },
+  {
+    title: "Weathered Strata & Earth Flow",
+    tagline: "Notice the transition between compacted earth and wild vegetative drift.",
+    sceneCue: "Fine grains of topsoil, fallen bark fragments, and mineral edges on the ground plane.",
+    objective: "Notice micro-textures beneath your feet that human eyes normally overlook while hurrying.",
+    sensoryAnchor: "Pick up a pinch of dry earth or a fallen pebble and feel its weight and grit between your fingers.",
+    steps: [
+      "Lower your phone and remain still for 60 seconds listening to grounding outdoor sounds.",
+      "Trace 10 paces along the natural contour of the terrain to find where rain water drains.",
+      "Examine three distinct fallen elements (a seed pod, a dried twig, a leaf skeleton).",
+    ],
+    lookBeyondFrame: "Look 20 meters ahead to find where the ground plane rises into the nearest hill or rise.",
+    reflectionPrompt: "What does the layering of fallen organic matter teach you about patience?",
+    safetyTip: "Watch your footing on loose gravel and uneven soil edges.",
+  },
+  {
+    title: "Pioneer Greenery & Stone Crevices",
+    tagline: "Observe the tenacious green life colonizing brick, asphalt, and concrete seams.",
+    sceneCue: "Hardened human-made masonry fractured by micro-moss and resilient wild shoots.",
+    objective: "Celebrate the persistent strength of nature flourishing in unexpected micro-habitats.",
+    sensoryAnchor: "Gently stroke the soft moss cushion with your fingertip, noting how moist it stays.",
+    steps: [
+      "Put your phone away and turn 90 degrees away from the wall or stone.",
+      "Search along the seam for the tiniest flowering sprout or pioneer lichen colony.",
+      "Take three slow breaths, observing how life reclaims stone surfaces over decades.",
+    ],
+    lookBeyondFrame: "Turn 180 degrees away to identify the nearest mature source tree feeding these airborne spores.",
+    reflectionPrompt: "Where in your own life can you find growth inside narrow crevices?",
+    safetyTip: "Stay on designated footpaths and be mindful of curbs and vehicles.",
+  },
+  {
+    title: "Wind Currents Across Leaf Margins",
+    tagline: "Observe subtle plant motion that a still photograph freezes in place.",
+    sceneCue: "Flexing stems and fluttering leaf margins responding to local air currents.",
+    objective: "Shift visual attention from static pixels to real-time kinetic nature choreography.",
+    sensoryAnchor: "Close your eyes and turn your face until you pinpoint the exact compass direction of the prevailing breeze.",
+    steps: [
+      "Put your phone away and watch a single branch tip for two full minutes without looking away.",
+      "Count the distinct gusts that arrive, noting the delay between sound and branch flex.",
+      "Take four long inhalations, matching the tempo of your chest to the waving branches.",
+    ],
+    lookBeyondFrame: "Scan 20 meters into the distance to see which taller tree crown is swaying in sync with this spot.",
+    reflectionPrompt: "How does matching your breath to moving foliage quiet internal urgency?",
+    safetyTip: "Keep footing stable while watching high overhead tree movement.",
+  },
+  {
+    title: "The Living Bark Topography",
+    tagline: "Explore the deep ridges, lichen maps, and micro-forests on tree trunks.",
+    sceneCue: "Vertical fissure lines, lichen crusts, and rough organic armor on a woody trunk.",
+    objective: "Connect tactile touch directly to the living biological column supporting canopy life.",
+    sensoryAnchor: "Rest both hands flat against the trunk and feel the structural thickness and coolness of the wood.",
+    steps: [
+      "Step forward until your chest is within arm's reach of the nearest trunk.",
+      "Trace one continuous bark furrow with your eyes from ground level as high as you can see.",
+      "Notice three color variations hidden within the bark (ash gray, olive green, rusted ochre).",
+    ],
+    lookBeyondFrame: "Look downward toward the root flare to see how wide the tree anchors into the earth.",
+    reflectionPrompt: "What protective armor do you carry that shields your own inner vitality?",
+    safetyTip: "Inspect bark with gentle eyes before touching; leave resting insects undisturbed.",
+  },
+  {
+    title: "Liquid Mirrors & Edge Riparian",
+    tagline: "Notice how sky and foliage reflect off damp pebbles and water edges.",
+    sceneCue: "Luminous liquid sheen, damp gravel, and mirrored sky fragments.",
+    objective: "Observe natural reflection, surface tension, and light refraction along boundaries.",
+    sensoryAnchor: "Hover your hands inches above the damp surface to feel the cool evaporative draft.",
+    steps: [
+      "Step back two paces to a secure, completely dry observation point.",
+      "Observe five distinct ripples or reflections crossing the surface without reaching for your screen.",
+      "Inhale slowly through your nose, noting mineral and aquatic scent nuances.",
+    ],
+    lookBeyondFrame: "Look along the shoreline or drainage contour to discover where dragonflies or birds land.",
+    reflectionPrompt: "How does the calm surface reflect the sky more clearly when the water is still?",
+    safetyTip: "Maintain safe distance from slick banks and sudden water drop-offs.",
+  },
+];
+
 export function getSampleSceneQuest(params?: {
   durationMinutes?: number;
   environment?: QuestPreference["environment"];
@@ -151,32 +244,27 @@ export function getSampleSceneQuest(params?: {
   const energy = params?.energyLevel || "gentle";
   const questType = params?.questType || "sensory";
 
+  // Pick dynamically from diverse pool
+  const template =
+    SCENE_SAMPLE_QUESTS[Math.floor(Math.random() * SCENE_SAMPLE_QUESTS.length)];
+
   return {
     id: `scene-sample-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    title: "Beyond the Snapshot",
-    tagline: "Notice the living ecosystem extending past your camera frame.",
+    title: template.title,
+    tagline: template.tagline,
     durationMinutes: duration,
     environment: env,
     energyLevel: energy,
     questType: questType,
-    objective:
-      "Expand your awareness from the single captured snapshot to the living horizon around you.",
-    sensoryAnchor:
-      "Touch a natural surface near where you stood and feel the ambient air temperature.",
-    steps: [
-      "Put your phone away and stand exactly where you captured the snapshot.",
-      "Turn 90 degrees away from the camera view and observe where that visual texture repeats.",
-      "Take five unhurried breaths while tracking how natural light shifts across the nearest tree or surface.",
-    ],
-    reflectionPrompt:
-      "What did you discover in the surrounding physical space that the camera snapshot completely missed?",
-    safetyTip: "Stay on safe paths and never step backward without checking behind you.",
-    sceneCue: "Living textures and daylight gradients extending past the camera frame.",
+    objective: template.objective,
+    sensoryAnchor: template.sensoryAnchor,
+    steps: template.steps,
+    reflectionPrompt: template.reflectionPrompt,
+    safetyTip: template.safetyTip,
+    sceneCue: template.sceneCue,
     confidence: "high",
-    confidenceNote:
-      "Curated tactile scene template grounded in mindful physical presence.",
-    lookBeyondFrame:
-      "Look 10 paces behind where you stood to observe how sound and wind shift outside the frame.",
+    confidenceNote: "Curated tactile scene grounded in mindful physical presence.",
+    lookBeyondFrame: template.lookBeyondFrame,
     generatedAt: new Date().toISOString(),
     providerUsed: "sample-curated",
     isSample: true,

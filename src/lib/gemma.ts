@@ -33,8 +33,8 @@ export function getGemmaConfig(): GemmaConfig {
   if (apiKey) {
     return {
       apiKey,
-      baseUrl: baseUrl || "https://api.groq.com/openai/v1", // Default fast hosted provider if url omitted
-      model,
+      baseUrl: baseUrl || "https://generativelanguage.googleapis.com/v1beta/openai",
+      model: model || "gemini-2.0-flash",
       provider: "cloud",
     };
   }
