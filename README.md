@@ -1,6 +1,8 @@
 # 🌿 TouchQuest
 **Hacktoberfest 2026 Open-Source AI Challenge — Week 1: Touch Grass**
 
+![TouchQuest Cover](public/cover.png)
+
 > Step away from your screen. Connect with the living world around you.
 
 TouchQuest is a mobile-first nature companion that generates personalized, mindful outdoor missions. Select your available time (5–45 minutes), environment, mood, and pace. Powered by Google's open-weight **Gemma 2** model, TouchQuest synthesizes an actionable, tactile mission with specific sensory anchors, reads it aloud via hands-free audio briefing, and switches into a distraction-free "phone-down" quest timer with natural bell chimes.
@@ -10,7 +12,8 @@ TouchQuest is a mobile-first nature companion that generates personalized, mindf
 ## ✨ Features
 
 - 🌲 **Tactile Nature Missions**: Tailored to your exact environment (urban park, balcony, trail, sidewalk, waterside) and energy level (stillness to brisk movement).
-- 🤖 **Real Gemma 2 Integration**: Generates structured missions using Google's open-weight `gemma-2-9b-it` or `gemma-2-2b-it` through hosted inference APIs (Groq, OpenRouter, Hugging Face) or local **Ollama**.
+- 🤖 **Real Gemma & Multimodal AI Integration**: Generates structured missions using Google's Gemma models via Google AI Studio (`gemini-3.5-flash`), local **Ollama** (`gemma3:4b`), or hosted OpenAI-compatible endpoints.
+- 📷 **"Look Once. See More." Scene Quests**: Snap a single photo of any outdoor setting (leaves, moss, stone, sky) for instant computer vision sensory quest synthesis.
 - 🛡️ **Zero-Harm Guardrails**: Server-side safety verification preventing road crossings, trespassing, handling venomous or wild fauna, and plant/mushroom ingestion.
 - 📱 **Phone-Down Mode**: Minimalist, high-contrast, distraction-free screen designed to stay in your pocket while you observe the outdoors.
 - 🔊 **Hands-Free Audio Briefing**: Web Speech API narrating your mission steps so you never have to look down at your screen while walking.
@@ -68,7 +71,7 @@ User (Browser)
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/Harry1402/nexuscrm.git touchquest
+git clone https://github.com/Harry1402/TouchQuest.git touchquest
 cd touchquest
 npm install
 ```
@@ -79,16 +82,17 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-Configure your preferred Gemma provider:
+Configure your preferred inference provider:
 ```env
-# Hosted Gemma 2 via Groq (super fast free tier):
-GEMMA_API_KEY=gsk_your_key_here
-GEMMA_API_BASE_URL=https://api.groq.com/openai/v1
-GEMMA_MODEL=gemma2-9b-it
+# Hosted Inference via Google AI Studio (Fast & Multimodal):
+GEMMA_API_KEY=your_google_ai_studio_api_key
+GEMMA_API_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
+GEMMA_MODEL=gemini-3.5-flash
 
-# OR Local Ollama:
+# OR 100% Private Local Gemma 3 via Ollama:
 # OLLAMA_BASE_URL=http://localhost:11434
-# OLLAMA_MODEL=gemma2:9b
+# OLLAMA_MODEL=gemma3:4b
+# GEMMA_VISION_MODEL=gemma3:4b
 ```
 
 > **Note**: If you don't provide an API key, TouchQuest runs automatically in **Curated Sample Mode**, giving you full functionality with verified nature quests!
@@ -148,8 +152,8 @@ TouchQuest believes in complete transparency regarding where your data travels:
 
 | Provider Mode | Latency | Network Destination | Privacy Guarantee |
 |:---|:---|:---|:---|
-| **Local Ollama** (`gemma2:9b`) | 800–2500ms | `http://localhost:11434` (on-device only) | **100% local**: Zero network packets leave your computer. |
-| **Hosted Gemma** (`gemma2-9b-it`) | 200–500ms | Encrypted HTTPS to Groq / OpenRouter API | API keys isolated on server; never leaked to frontend. |
+| **Local Ollama** (`gemma3:4b`) | 800–2500ms | `http://localhost:11434` (on-device only) | **100% local**: Zero network packets leave your computer. |
+| **Hosted AI Studio** (`gemini-3.5-flash`) | 300–900ms | Encrypted HTTPS to Google AI Studio | Server-side API key isolation; zero client credential exposure. |
 | **Curated Sample Mode** | < 10ms | Internal memory | Offline, deterministic, zero network calls required. |
 
 Each generated quest displays a transparent provider badge showing the active model and roundtrip generation latency.
@@ -167,4 +171,4 @@ Each generated quest displays a transparent provider badge showing the active mo
 ---
 
 ## 📜 License
-MIT License • Created for the Open-Source AI Challenge 2026.
+[MIT License](LICENSE) • Created for the Open-Source AI Challenge 2026.
