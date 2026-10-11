@@ -238,14 +238,25 @@ ${preference.customContext ? `User custom mood/context note: "${preference.custo
             { role: "user", content: userPrompt },
           ],
           temperature: 0.7,
-          max_tokens: 800,
+          max_tokens: 4096,
           response_format: { type: "json_object" },
         }),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(30000),
       });
 
       if (!response.ok) {
-        throw new Error(`Gemma Cloud API failed: ${response.status} ${response.statusText}`);
+        let errDetail = response.statusText;
+        try {
+          const errData = await response.json();
+          if (errData?.error?.message) {
+            errDetail = errData.error.message;
+          } else if (Array.isArray(errData) && errData[0]?.error?.message) {
+            errDetail = errData[0].error.message;
+          }
+        } catch {
+          // ignore
+        }
+        throw new Error(`Gemma Cloud API failed: ${response.status} ${errDetail}`);
       }
 
       const json = await response.json();

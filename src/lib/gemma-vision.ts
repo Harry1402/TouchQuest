@@ -306,14 +306,25 @@ No preamble, no markdown formatting outside JSON.`;
           ],
           response_format: { type: "json_object" },
           temperature: 0.5,
-          max_tokens: 900,
+          max_tokens: 4096,
         }),
-        signal: AbortSignal.timeout(25000),
+        signal: AbortSignal.timeout(35000),
       });
 
       if (!response.ok) {
+        let errDetail = response.statusText;
+        try {
+          const errData = await response.json();
+          if (errData?.error?.message) {
+            errDetail = errData.error.message;
+          } else if (Array.isArray(errData) && errData[0]?.error?.message) {
+            errDetail = errData[0].error.message;
+          }
+        } catch {
+          // ignore
+        }
         throw new Error(
-          `Hosted vision API failed (${response.status}): ${response.statusText}`
+          `Hosted vision API failed (${response.status}): ${errDetail}`
         );
       }
 
