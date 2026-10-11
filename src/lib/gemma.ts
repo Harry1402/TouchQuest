@@ -31,13 +31,14 @@ export function getGemmaConfig(): GemmaConfig {
   }
 
   if (apiKey) {
-    let resolvedModel = model || "gemini-3.8-flash";
+    let resolvedModel = model || "gemini-3.5-flash";
     if (
-      resolvedModel.includes("gemma2") ||
-      resolvedModel.includes("gemini-2.0") ||
+      resolvedModel.includes("gemma") ||
+      resolvedModel.includes("gemini-2") ||
+      resolvedModel.includes("gemini-1") ||
       resolvedModel.includes("llama")
     ) {
-      resolvedModel = "gemini-3.8-flash";
+      resolvedModel = "gemini-3.5-flash";
     }
     return {
       apiKey,
