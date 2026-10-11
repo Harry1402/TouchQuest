@@ -31,10 +31,18 @@ export function getGemmaConfig(): GemmaConfig {
   }
 
   if (apiKey) {
+    let resolvedModel = model || "gemini-3.8-flash";
+    if (
+      resolvedModel.includes("gemma2") ||
+      resolvedModel.includes("gemini-2.0") ||
+      resolvedModel.includes("llama")
+    ) {
+      resolvedModel = "gemini-3.8-flash";
+    }
     return {
       apiKey,
       baseUrl: baseUrl || "https://generativelanguage.googleapis.com/v1beta/openai",
-      model: model || "gemini-2.0-flash",
+      model: resolvedModel,
       provider: "cloud",
     };
   }

@@ -39,9 +39,17 @@ export function getVisionConfig(): VisionModelConfig {
 
   // If hosted vision API key is provided
   if (apiKey) {
+    let resolvedModel = visionModel || "gemini-3.8-flash";
+    if (
+      resolvedModel.includes("gemma2") ||
+      resolvedModel.includes("gemini-2.0") ||
+      resolvedModel.includes("llama")
+    ) {
+      resolvedModel = "gemini-3.8-flash";
+    }
     return {
       provider: "hosted",
-      model: visionModel || "gemini-2.0-flash",
+      model: resolvedModel,
       baseUrl: hostedBaseUrl,
       apiKey,
       isLocal: false,
@@ -50,7 +58,7 @@ export function getVisionConfig(): VisionModelConfig {
 
   return {
     provider: "unavailable",
-    model: visionModel || "gemini-2.0-flash",
+    model: visionModel || "gemini-3.8-flash",
     isLocal: false,
   };
 }
