@@ -17,13 +17,19 @@ const HAZARD_PATTERNS = [
   /\b(touch snake|pick up insect|catch squirrel|pet wild)\b/i,
   /\b(mushroom foraging|eat mushroom|eat berry)\b/i,
   /\b(cliff edge|jump down|swim in rapids)\b/i,
+  /\b(poison ivy|poison oak|poison sumac)\b/i,
+  /\b(pluck leaves|rip leaves|pluck living|destroy flora)\b/i,
 ];
 
-export function checkQuestSafety(quest: QuestGeneratedData): { safe: boolean; reason?: string } {
+export function checkQuestSafety(
+  quest: QuestGeneratedData & { sceneCue?: string; lookBeyondFrame?: string }
+): { safe: boolean; reason?: string } {
   const combinedText = [
     quest.title,
     quest.objective,
     quest.sensoryAnchor,
+    quest.sceneCue || "",
+    quest.lookBeyondFrame || "",
     ...quest.steps,
     quest.safetyTip,
   ].join(" ");

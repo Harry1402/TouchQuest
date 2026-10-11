@@ -139,3 +139,47 @@ export function getSampleQuest(pref: QuestPreference): Quest {
     isSample: true,
   };
 }
+
+export function getSampleSceneQuest(params?: {
+  durationMinutes?: number;
+  environment?: QuestPreference["environment"];
+  energyLevel?: QuestPreference["energyLevel"];
+  questType?: QuestPreference["questType"];
+}): Quest {
+  const duration = params?.durationMinutes || 10;
+  const env = params?.environment || "park";
+  const energy = params?.energyLevel || "gentle";
+  const questType = params?.questType || "sensory";
+
+  return {
+    id: `scene-sample-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    title: "Beyond the Snapshot",
+    tagline: "Notice the living ecosystem extending past your camera frame.",
+    durationMinutes: duration,
+    environment: env,
+    energyLevel: energy,
+    questType: questType,
+    objective:
+      "Expand your awareness from the single captured snapshot to the living horizon around you.",
+    sensoryAnchor:
+      "Touch a natural surface near where you stood and feel the ambient air temperature.",
+    steps: [
+      "Put your phone away and stand exactly where you captured the snapshot.",
+      "Turn 90 degrees away from the camera view and observe where that visual texture repeats.",
+      "Take five unhurried breaths while tracking how natural light shifts across the nearest tree or surface.",
+    ],
+    reflectionPrompt:
+      "What did you discover in the surrounding physical space that the camera snapshot completely missed?",
+    safetyTip: "Stay on safe paths and never step backward without checking behind you.",
+    sceneCue: "Living textures and daylight gradients extending past the camera frame.",
+    confidence: "high",
+    confidenceNote:
+      "Curated tactile scene template grounded in mindful physical presence.",
+    lookBeyondFrame:
+      "Look 10 paces behind where you stood to observe how sound and wind shift outside the frame.",
+    generatedAt: new Date().toISOString(),
+    providerUsed: "sample-curated",
+    isSample: true,
+    isMultimodal: true,
+  };
+}

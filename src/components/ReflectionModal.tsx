@@ -45,6 +45,7 @@ export function ReflectionModal({
   const [preMood, setPreMood] = useState<number>(2);
   const [postMood, setPostMood] = useState<number>(4);
   const [reflection, setReflection] = useState<string>("");
+  const [aiMissed, setAiMissed] = useState<string>("");
 
   useEffect(() => {
     // Fire festive mindful confetti
@@ -75,6 +76,7 @@ export function ReflectionModal({
       postMoodRating: postMood,
       completionStatus,
       relevanceRating: relevance,
+      aiMissedReflection: aiMissed.trim() || undefined,
     });
   };
 
@@ -221,6 +223,27 @@ export function ReflectionModal({
               onChange={(e) => setReflection(e.target.value)}
               placeholder="One thought, sound, or feeling you noticed..."
               className="w-full rounded-xl border border-[#E6DFD3] bg-[#FBF9F4] p-3 text-sm text-[#1C2720] placeholder-[#9CA79E] transition focus:border-[#244836] focus:bg-white focus:outline-hidden"
+            />
+          </div>
+
+          {/* Q5: What did you notice that the AI missed? */}
+          <div className="rounded-2xl border border-[#D5E2D8] bg-[#F1F7F3] p-4">
+            <label
+              htmlFor="aiMissedText"
+              className="block text-xs font-bold uppercase tracking-wider text-[#244836] mb-1"
+            >
+              Beyond the Model
+            </label>
+            <p className="text-sm font-semibold text-[#1C2720] mb-2">
+              What did you notice that the AI missed?
+            </p>
+            <input
+              id="aiMissedText"
+              type="text"
+              value={aiMissed}
+              onChange={(e) => setAiMissed(e.target.value)}
+              placeholder="e.g. The cool breeze from the creek, a small bird in the high branches..."
+              className="w-full rounded-xl border border-[#D5E2D8] bg-white p-2.5 text-xs text-[#1C2720] placeholder-[#8A988E] transition focus:border-[#244836] focus:outline-hidden"
             />
           </div>
 

@@ -4,9 +4,7 @@ import React, { useState } from "react";
 import {
   Volume2,
   VolumeX,
-  Play,
   ArrowLeft,
-  Sparkles,
   Clock,
   Compass,
   HandMetal,
@@ -16,9 +14,14 @@ import {
   Cpu,
   Wifi,
   WifiOff,
+  Info,
+  SlidersHorizontal,
+  Camera,
+  Eye,
 } from "lucide-react";
 import { Quest } from "@/types/quest";
 import { speakQuest, stopSpeech, isSpeechSupported } from "@/lib/speech";
+import { VoiceSettingsModal } from "./VoiceSettingsModal";
 
 interface QuestDisplayProps {
   quest: Quest;
@@ -36,9 +39,27 @@ function ProviderBadge({ quest }: { quest: Quest }) {
     );
   }
 
-  const isLocal = quest.providerUsed === "gemma-local";
+  const isLocalVision = quest.providerUsed === "gemma-local-vision";
+  const isCloudVision = quest.providerUsed === "gemma-cloud-vision";
+  const isLocal = quest.providerUsed === "gemma-local" || isLocalVision;
   const latency = quest.generationLatencyMs;
   const model = quest.modelName || "gemma2";
+
+  if (isLocalVision || isCloudVision) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE1D4] bg-[#EBF4EE] px-3 py-1 text-xs font-semibold text-[#244836]">
+        <Camera className="h-3 w-3" />
+        {isLocalVision
+          ? `Local Gemma Vision (${model}) • on-device`
+          : `Hosted Gemma Vision (${model}) • encrypted HTTPS`}
+        {latency != null && (
+          <span className="font-mono text-[10px] text-[#5A7962]">
+            {latency}ms
+          </span>
+        )}
+      </span>
+    );
+  }
 
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE1D4] bg-[#EBF4EE] px-3 py-1 text-xs font-semibold text-[#244836]">
@@ -66,6 +87,7 @@ export function QuestDisplay({
 }: QuestDisplayProps) {
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [briefingDone, setBriefingDone] = useState<boolean>(false);
+  const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState<boolean>(false);
   const speechAvailable = isSpeechSupported();
 
   const handleListenBriefing = () => {
@@ -107,6 +129,13 @@ export function QuestDisplay({
         <ProviderBadge quest={quest} />
       </div>
 
+      {quest.generationNotice && (
+        <div className="flex items-start gap-2.5 rounded-2xl border border-[#E8DFC9] bg-[#F7F2E8] p-3.5 text-xs text-[#6F5E4B]">
+          <Info className="h-4 w-4 shrink-0 text-[#A67C52] mt-0.5" />
+          <span className="leading-relaxed">{quest.generationNotice}</span>
+        </div>
+      )}
+
       {/* Main Quest Card */}
       <div className="rounded-3xl border border-[#E6DFD3] bg-white p-6 shadow-sm sm:p-8">
         {/* Header tags */}
@@ -129,13 +158,49 @@ export function QuestDisplay({
           &ldquo;{quest.tagline}&rdquo;
         </p>
 
+        {/* Multimodal Scene Observation */}
+        {quest.sceneCue && (
+          <div className="mt-4 rounded-2xl border border-[#D5E2D8] bg-[#F1F7F3] p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#244836]">
+                <Camera className="h-4 w-4" />
+                <span>Scene Observation</span>
+              </div>
+              {quest.confidence && (
+                <span className="rounded-full bg-[#E8EDE3] px-2.5 py-0.5 text-[10px] font-semibold capitalize text-[#244836]">
+                  {quest.confidence} confidence
+                </span>
+              )}
+            </div>
+            <p className="mt-1.5 text-sm text-[#1C2720] leading-relaxed">
+              {quest.sceneCue}
+            </p>
+          </div>
+        )}
+
         {/* Objective Box */}
-        <div className="mt-5 rounded-2xl bg-[#F7F4EC] p-4 text-sm text-[#3E4A40] border border-[#EBE4D5]">
+        <div className="mt-4 rounded-2xl bg-[#F7F4EC] p-4 text-sm text-[#3E4A40] border border-[#EBE4D5]">
           <strong className="block font-semibold text-[#1C2720] mb-0.5">
             Mission Objective
           </strong>
           {quest.objective}
         </div>
+
+        {/* Look Beyond the Frame (Multimodal Differentiator) */}
+        {quest.lookBeyondFrame && (
+          <div className="mt-4 rounded-2xl border-2 border-[#BC683D]/30 bg-[#FFFBF8] p-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#BC683D]">
+              <Eye className="h-4 w-4" />
+              <span>Look Beyond The Frame</span>
+            </div>
+            <p className="mt-1 text-sm font-semibold text-[#1C2720]">
+              {quest.lookBeyondFrame}
+            </p>
+            <p className="mt-1 text-[11px] text-[#8C6D58]">
+              The snapshot was just a sensor. Your mission is in the physical world outside the picture.
+            </p>
+          </div>
+        )}
 
         {/* Sensory Anchor Highlight */}
         <div className="mt-4 rounded-2xl border border-[#D5E2D8] bg-[#F1F7F3] p-4">
@@ -191,38 +256,50 @@ export function QuestDisplay({
             Ready? Two steps to nature.
           </h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Step 1: Audio briefing */}
-            <button
-              type="button"
-              onClick={handleListenBriefing}
-              disabled={!speechAvailable}
-              className={`relative flex items-center justify-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-semibold transition active:scale-95 ${
-                isSpeaking
-                  ? "border-amber-600 bg-amber-50 text-amber-800 animate-pulse"
-                  : briefingDone
-                    ? "border-[#CDE1D4] bg-[#EBF4EE] text-[#244836]"
-                    : "border-[#E6DFD3] bg-white text-[#1C2720] hover:bg-[#F2ECE1]"
-              } ${!speechAvailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-            >
-              {isSpeaking ? (
-                <>
-                  <VolumeX className="h-4 w-4" />
-                  <span>Stop Audio</span>
-                </>
-              ) : (
-                <>
-                  <Volume2 className="h-4 w-4 text-[#244836]" />
-                  <span>
-                    {briefingDone ? "✓ Briefing heard" : "Step 1: Listen to briefing"}
+            {/* Step 1: Audio briefing & Voice Settings */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleListenBriefing}
+                disabled={!speechAvailable}
+                className={`relative flex flex-1 items-center justify-center gap-2 rounded-2xl border px-3 sm:px-4 py-3.5 text-sm font-semibold transition active:scale-95 ${
+                  isSpeaking
+                    ? "border-amber-600 bg-amber-50 text-amber-800 animate-pulse"
+                    : briefingDone
+                      ? "border-[#CDE1D4] bg-[#EBF4EE] text-[#244836]"
+                      : "border-[#E6DFD3] bg-white text-[#1C2720] hover:bg-[#F2ECE1]"
+                } ${!speechAvailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                {isSpeaking ? (
+                  <>
+                    <VolumeX className="h-4 w-4" />
+                    <span>Stop Audio</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="h-4 w-4 text-[#244836]" />
+                    <span>
+                      {briefingDone ? "✓ Briefing heard" : "Step 1: Briefing"}
+                    </span>
+                  </>
+                )}
+                {!speechAvailable && (
+                  <span className="absolute -bottom-5 text-[10px] text-[#8C988F]">
+                    Audio not supported in this browser
                   </span>
-                </>
-              )}
-              {!speechAvailable && (
-                <span className="absolute -bottom-5 text-[10px] text-[#8C988F]">
-                  Audio not supported in this browser
-                </span>
-              )}
-            </button>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsVoiceSettingsOpen(true)}
+                disabled={!speechAvailable}
+                title="Change narrator voice or pace"
+                className="flex items-center justify-center rounded-2xl border border-[#E6DFD3] bg-white px-3.5 py-3.5 text-[#4C584E] transition hover:bg-[#F2ECE1] hover:text-[#1C2720] shadow-2xs active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+              </button>
+            </div>
 
             {/* Step 2: Pocket phone & start timer */}
             <button
@@ -239,6 +316,12 @@ export function QuestDisplay({
           </div>
         </div>
       </div>
+
+      {/* Voice Settings Modal */}
+      <VoiceSettingsModal
+        isOpen={isVoiceSettingsOpen}
+        onClose={() => setIsVoiceSettingsOpen(false)}
+      />
     </div>
   );
 }

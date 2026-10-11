@@ -8,10 +8,10 @@ export function proxy() {
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
-  // Strict Privacy: explicitly disable geolocation, camera, and microphone permissions
+  // Privacy & Safety: allow first-party camera for scene sensor; restrict geolocation, microphone, and tracking
   response.headers.set(
     "Permissions-Policy",
-    "geolocation=(), camera=(), microphone=(), interest-cohort=()"
+    "geolocation=(), camera=(self), microphone=(), interest-cohort=()"
   );
 
   return response;

@@ -7,6 +7,7 @@ import { QuestDisplay } from "@/components/QuestDisplay";
 import { QuestMode } from "@/components/QuestMode";
 import { ReflectionModal } from "@/components/ReflectionModal";
 import { JournalDrawer } from "@/components/JournalDrawer";
+import { SceneCameraModal } from "@/components/SceneCameraModal";
 import {
   Quest,
   QuestPreference,
@@ -23,6 +24,7 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
+  Camera,
 } from "lucide-react";
 
 export default function Home() {
@@ -31,6 +33,7 @@ export default function Home() {
   const [showReflection, setShowReflection] = useState<boolean>(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [isJournalOpen, setIsJournalOpen] = useState<boolean>(false);
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isQuickStartLoading, setIsQuickStartLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -176,35 +179,50 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ⚡ Quick Start CTA */}
+            {/* ⚡ Quick Start & Multimodal Vision CTA */}
             <div className="rounded-3xl border-2 border-[#244836] bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col items-center text-center sm:flex-row sm:text-left gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col gap-4">
+                <div>
                   <h2 className="font-serif text-xl font-bold tracking-tight text-[#1C2720] sm:text-2xl">
                     Ready for a screen break?
                   </h2>
                   <p className="mt-1 text-sm text-[#667269]">
-                    1-tap 5-minute outdoor reset. Suitable for any nearby sidewalk, bench, or window.
+                    Choose a camera-guided snapshot exploration or an instant 5-minute outdoor reset.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleQuickStart}
-                  disabled={anyLoading}
-                  className="flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-[#244836] px-6 py-3.5 font-serif text-base font-semibold text-white shadow-md transition hover:bg-[#1B382A] active:scale-[0.98] disabled:opacity-70 cursor-pointer"
-                >
-                  {isQuickStartLoading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-5 w-5" />
-                      <span>Get me outside now</span>
-                    </>
-                  )}
-                </button>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Option A: Multimodal Gemma Vision */}
+                  <button
+                    type="button"
+                    onClick={() => setIsCameraModalOpen(true)}
+                    disabled={anyLoading}
+                    className="flex items-center justify-center gap-2.5 rounded-2xl bg-[#244836] px-5 py-3.5 font-serif text-sm font-semibold text-white shadow-md transition hover:bg-[#1B382A] active:scale-[0.98] disabled:opacity-70 cursor-pointer"
+                  >
+                    <Camera className="h-4 w-4" />
+                    <span>Look around with AI</span>
+                  </button>
+
+                  {/* Option B: Text Quick-Start */}
+                  <button
+                    type="button"
+                    onClick={handleQuickStart}
+                    disabled={anyLoading}
+                    className="flex items-center justify-center gap-2.5 rounded-2xl border border-[#D5E2D8] bg-[#F1F7F3] px-5 py-3.5 font-serif text-sm font-semibold text-[#244836] shadow-xs transition hover:bg-[#E4EFE7] active:scale-[0.98] disabled:opacity-70 cursor-pointer"
+                  >
+                    {isQuickStartLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-4 w-4" />
+                        <span>Get me outside now</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -271,6 +289,16 @@ export default function Home() {
           history={history}
           onClearHistory={handleClearHistory}
         />
+
+        {/* Scene Camera Modal ("Look once. See more.") */}
+        <SceneCameraModal
+          isOpen={isCameraModalOpen}
+          onClose={() => setIsCameraModalOpen(false)}
+          onQuestGenerated={(generatedQuest) => {
+            setQuest(generatedQuest);
+            setViewState("display");
+          }}
+        />
       </main>
 
       {/* Earthy Minimal Footer */}
@@ -282,14 +310,14 @@ export default function Home() {
               <span>TouchQuest • Open Source Nature Companion</span>
             </div>
             <p className="mt-0.5 text-[11px] text-[#7A867D]">
-              Built with Google Gemma 2 open weights, Next.js, and privacy-first local storage.
+              Built with Google Gemma 3 open weights, Next.js, and privacy-first local storage.
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-medium">
             <span className="flex items-center gap-1 text-[#244836]">
               <Cpu className="h-3.5 w-3.5" />
-              <span>Gemma 2 Powered</span>
+              <span>Gemma 3 Powered</span>
             </span>
             <span className="text-[#A4B0A7]">•</span>
             <span>Zero PII Tracking</span>

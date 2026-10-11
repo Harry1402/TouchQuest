@@ -47,17 +47,34 @@ export const QUICK_START_PREFERENCE: QuestPreference = {
 };
 
 export const QuestResponseSchema = z.object({
-  title: z.string().min(3).max(80),
-  tagline: z.string().min(5).max(120),
-  durationMinutes: z.number().int().min(3).max(60),
-  objective: z.string().min(10).max(250),
-  sensoryAnchor: z.string().min(10).max(200),
-  steps: z.array(z.string().min(10).max(250)).min(3).max(5),
-  reflectionPrompt: z.string().min(10).max(200),
-  safetyTip: z.string().min(5).max(180),
+  title: z.string().min(2).max(100),
+  tagline: z.string().min(3).max(150),
+  durationMinutes: z.number().int().min(1).max(60),
+  objective: z.string().min(5).max(300),
+  sensoryAnchor: z.string().min(5).max(250),
+  steps: z.array(z.string().min(5).max(300)).min(1).max(8),
+  reflectionPrompt: z.string().min(5).max(250),
+  safetyTip: z.string().min(3).max(250),
 });
 
 export type QuestGeneratedData = z.infer<typeof QuestResponseSchema>;
+
+export const SceneQuestResponseSchema = z.object({
+  sceneCue: z.string().min(5).max(300),
+  confidence: z.enum(["low", "medium", "high"]).default("medium"),
+  confidenceNote: z.string().max(250).optional().default(""),
+  title: z.string().min(2).max(100),
+  tagline: z.string().min(3).max(150),
+  durationMinutes: z.number().int().min(1).max(60),
+  objective: z.string().min(5).max(300),
+  sensoryAnchor: z.string().min(5).max(250),
+  steps: z.array(z.string().min(5).max(300)).min(1).max(8),
+  lookBeyondFrame: z.string().min(5).max(300),
+  reflectionPrompt: z.string().min(5).max(250),
+  safetyTip: z.string().min(3).max(250),
+});
+
+export type SceneQuestGeneratedData = z.infer<typeof SceneQuestResponseSchema>;
 
 export interface Quest extends QuestGeneratedData {
   id: string;
@@ -65,10 +82,21 @@ export interface Quest extends QuestGeneratedData {
   energyLevel: EnergyLevel;
   questType: QuestType;
   generatedAt: string;
-  providerUsed: "gemma-cloud" | "gemma-local" | "sample-curated";
+  providerUsed:
+    | "gemma-cloud"
+    | "gemma-local"
+    | "sample-curated"
+    | "gemma-local-vision"
+    | "gemma-cloud-vision";
   isSample: boolean;
   modelName?: string;
   generationLatencyMs?: number;
+  generationNotice?: string;
+  isMultimodal?: boolean;
+  sceneCue?: string;
+  confidence?: "low" | "medium" | "high";
+  confidenceNote?: string;
+  lookBeyondFrame?: string;
 }
 
 export type CompletionStatus = "completed" | "partial" | "interrupted";
@@ -87,6 +115,7 @@ export interface QuestLog {
   postMoodRating: number; // 1 to 5
   completionStatus?: CompletionStatus;
   relevanceRating?: number; // 1 to 5
+  aiMissedReflection?: string;
 }
 
 export interface UserStats {

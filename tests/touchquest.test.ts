@@ -4,10 +4,12 @@ import {
   QuestPreferenceSchema,
   QUICK_START_PREFERENCE,
   QuestResponseSchema,
+  SceneQuestResponseSchema,
 } from "@/types/quest";
 import type { QuestGeneratedData } from "@/types/quest";
 import { checkQuestSafety } from "@/lib/safety";
-import { cleanJsonText } from "@/lib/gemma";
+import { cleanJsonText, normalizeParsedQuest } from "@/lib/gemma";
+import { normalizeParsedSceneQuest } from "@/lib/gemma-vision";
 import { getSampleQuest } from "@/lib/sample-quests";
 
 describe("TouchQuest Core Tests", () => {
@@ -21,7 +23,7 @@ describe("TouchQuest Core Tests", () => {
     });
   });
 
-  describe("Zod Quest Schema Validation", () => {
+  describe("Zod Quest Schema Validation & Normalization", () => {
     test("validates complete, conformant quest JSON", () => {
       const validPayload = {
         title: "Sidewalk Lichen Whisper",
@@ -44,21 +46,39 @@ describe("TouchQuest Core Tests", () => {
       assert.equal(validated.steps.length, 4);
     });
 
-    test("rejects payload missing mandatory steps or with out-of-range duration", () => {
+    test("rejects payload with empty fields or out-of-range duration", () => {
       const invalidPayload = {
-        title: "Too Short",
-        tagline: "Short",
-        durationMinutes: 1, // min is 3
-        objective: "Too short",
-        sensoryAnchor: "Short",
-        steps: ["Only one step"], // min is 3
-        reflectionPrompt: "Short",
-        safetyTip: "Tip",
+        title: "",
+        tagline: "",
+        durationMinutes: 0,
+        objective: "",
+        sensoryAnchor: "",
+        steps: [],
+        reflectionPrompt: "",
+        safetyTip: "",
       };
 
       assert.throws(() => {
         QuestResponseSchema.parse(invalidPayload);
       });
+    });
+
+    test("normalizes compact model output with 1 step into a complete 3-step quest", () => {
+      const compactModelOutput = {
+        title: "Tree Observation",
+        tagline: "Look closely at a tree",
+        durationMinutes: 5,
+        objective: "Notice subtle leaf details",
+        sensoryAnchor: "Touch tree bark",
+        steps: ["Walk to the nearest tree"],
+        reflectionPrompt: "What did you see?",
+        safetyTip: "Watch your footing",
+      };
+
+      const normalized = normalizeParsedQuest(compactModelOutput, QUICK_START_PREFERENCE);
+      assert.ok(normalized.steps.length >= 3);
+      const validated = QuestResponseSchema.parse(normalized);
+      assert.equal(validated.title, "Tree Observation");
     });
   });
 
@@ -141,6 +161,81 @@ describe("TouchQuest Core Tests", () => {
       assert.equal(quest.providerUsed, "sample-curated");
       const validated = QuestResponseSchema.parse(quest);
       assert.ok(validated);
+    });
+  });
+
+  describe("Multimodal Scene Quest & Look Beyond Frame", () => {
+    test("validates conforming SceneQuestResponseSchema payload", () => {
+      const validScene = {
+        sceneCue: "Moss expanding along shaded limestone steps next to an asphalt walkway.",
+        confidence: "high",
+        confidenceNote: "Clear natural light on textured stone surface",
+        title: "The Limestone Seam",
+        tagline: "Follow where mineral meets botanical life.",
+        durationMinutes: 10,
+        objective: "Notice how living moss colonies colonize human-quarried limestone.",
+        sensoryAnchor: "Rest fingertips against cool damp moss carpet",
+        steps: [
+          "Put phone in pocket and turn 90 degrees away from where you took this photo.",
+          "Walk 15 paces along the stone boundary.",
+          "Find another seam where moisture collects and observe its micro-flora.",
+        ],
+        lookBeyondFrame: "Find where this stone path leads into the unpaved tree line.",
+        reflectionPrompt: "What did you notice that the camera frame cut off?",
+        safetyTip: "Watch for slippery moss on damp steps.",
+      };
+
+      const validated = SceneQuestResponseSchema.parse(validScene);
+      assert.equal(validated.title, "The Limestone Seam");
+      assert.equal(validated.confidence, "high");
+      assert.ok(validated.lookBeyondFrame.length > 5);
+      assert.equal(validated.steps.length, 3);
+    });
+
+    test("normalizes compact vision output and pads steps cleanly", () => {
+      const rawVisionOutput = {
+        sceneCue: "Cracked pavement with dandelion roots",
+        confidence: "medium",
+        title: "Pavement Pioneers",
+        tagline: "Life between the cracks",
+        durationMinutes: 10,
+        objective: "Trace the resilience of urban flora",
+        sensoryAnchor: "Touch warm asphalt edge",
+        steps: ["Look at the crack in the sidewalk"],
+        lookBeyondFrame: "Look across the street for a tree breaking through curb stones",
+        reflectionPrompt: "What did the camera miss?",
+        safetyTip: "Stay on sidewalks",
+      };
+
+      const normalized = normalizeParsedSceneQuest(rawVisionOutput, 10);
+      assert.ok(normalized.steps.length >= 3);
+      const validated = SceneQuestResponseSchema.parse(normalized);
+      assert.equal(validated.title, "Pavement Pioneers");
+      assert.equal(validated.confidence, "medium");
+    });
+
+    test("runs Leave-No-Trace safety scanner on scene quest", () => {
+      const unsafeSceneQuest = {
+        sceneCue: "Poison ivy patch near trail fence",
+        confidence: "medium",
+        confidenceNote: "",
+        title: "Vine Touching Quest",
+        tagline: "Explore the wild leaves",
+        durationMinutes: 5,
+        objective: "Touch the oily leaves of the three-leaf vine to feel its texture.",
+        sensoryAnchor: "Rub leaves on fingers",
+        steps: [
+          "Walk to the vine",
+          "Pluck three leaves from the vine",
+          "Crush leaves between fingers",
+        ],
+        lookBeyondFrame: "Search for more vines to pick",
+        reflectionPrompt: "How did it feel?",
+        safetyTip: "Be mindful",
+      };
+
+      const safetyResult = checkQuestSafety(unsafeSceneQuest);
+      assert.equal(safetyResult.safe, false);
     });
   });
 });
